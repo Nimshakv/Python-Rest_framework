@@ -1,0 +1,330 @@
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'Department')">Departments</button>
+      <button class="tablinks" onclick="openTab(event, 'Employee')">Employees</button>
+    </div>
+
+    <div id="Department" class="tabcontent">
+        <h3>Departments</h3>
+        <input type="button" value="Create new department" onclick="create_dept();" style="float: right;">
+        <br>
+        <br>
+        <table class="custom_table" id="dept_table">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% for dep in departments %}
+                <tr>
+                    {% for key, value in dep.items %}
+                        {% if key == "id" %}
+                            <input type="hidden" name="dept_id" id="dept_id" value="{{ value }}">
+                        {% else %}
+                            <td id="dept_{{key}}">{{ value }}</td>
+                        {% endif %}
+                    {% endfor%}
+                    <td><a href="#" class="editDept">Edit</a></td>
+                    <td><a href="#" class="deleteDept">Delete</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <form action="{% url 'website:index' %}" method="POST" id="dept_form">
+            {% csrf_token %}
+            <label>Name</label><br>
+            <input type="text" name="dept_name" id="dept_name"><br>
+            <label>Description</label><br>
+            <input type="text" name="dept_description"><br>
+            <input type="hidden" name="type" id="dept_hide" value="department">
+            <input onclick="dept_form_cancel();" type="cancel" value="Cancel" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+
+    <div id="Employee" class="tabcontent">
+      <h3>Employees</h3>
+        <input type="button" value="Create new Employee" onclick="create_emp();" style="float: right;">
+        <br>
+        <br>
+      <table class="custom_table" id="emp_table">
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Department</th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for emp in employees %}
+            <tr>
+                {% for key, value in emp.items %}
+                    {% if key == "id" or key == "dob" or key == "department_id" %}
+                        <input type="hidden" name="emp_{{key}}" id="emp_h_{{key}}" value="{{ value }}">
+                    {% else %}
+                        <td id="emp_{{key}}">{{ value }}</td>
+                    {% endif %}
+                {% endfor%}
+                <td><a href="#" class="editEmp">Edit</a></td>
+                <td><a href="#" class="deleteEmp">Delete</a></td>
+            </tr>
+        {% endfor %}
+      </table>
+        <form action="{% url 'website:index' %}" method="POST" id="emp_form">
+            {% csrf_token %}
+            <label>Name</label><br>
+            <input type="text" name="emp_name"><br>
+            <label>Date of Birth</label><br>
+            <input type="date" name="emp_dob"><br>
+            <label>Department</label><br>
+            <select name="emp_dept_name">
+                {% for dep in departments %}
+                    {% for key, value in dep.items %}
+                        {% if key == "name" %}
+                            <option value="{{ value }}">{{ value }}</option>
+                        {% endif %}
+                    {% endfor%}
+                {% endfor %}
+            </select><br>
+            <input type="hidden" name="type" id="emp_hide" value="employee">
+            <input onclick="emp_form_cancel();" type="cancel" value="Cancel" />
+            <input id="submit" type="submit" value="Submit" />
+        </form>
+    </div>
+
+</body>
+
+<style>
+.custom_table {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.custom_table td, .custom_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.custom_table tr:nth-child(even){background-color: #f2f2f2;}
+
+.custom_table tr:hover {background-color: #ddd;}
+
+.custom_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: lightseagreen;
+  color: white;
+}
+
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+input[type=text], input[type=date], select {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit], input[type=cancel]{
+  width: 25%;
+  background-color: lightseagreen;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover, input[type=cancel]:hover{
+  background-color: darkseagreen;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+</style>
+
+<script>
+
+
+
+function openTab(evt, tabname) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(tabname).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+function create_dept(){
+    $("#dept_table").hide();
+    $("#dept_form").show();
+    $("#dept_hide").val("department");
+    $("#dept_form").trigger("reset");
+}
+
+function create_emp(){
+    $("#emp_table").hide();
+    $("#emp_form").show();
+    $("#emp_hide").val("employee");
+    $("#emp_form").trigger("reset");
+}
+
+$(function(){
+    $(".editDept").click(function(){
+        var dept_name = $(this).parent().siblings("#dept_name").text();
+        var dept_description = $(this).parent().siblings("#dept_description").text();
+        $("[name='dept_name']").val(dept_name);
+        $("[name='dept_description']").val(dept_description);
+        $("#dept_hide").val("department_edit");
+        $("#dept_table").hide();
+        $("#dept_form").show();
+    });
+
+});
+
+$(function(){
+    $(".editEmp").click(function(){
+        var emp_name = $(this).parent().siblings("#emp_name").text();
+        var emp_age = $(this).parent().siblings("#emp_h_dob").val();
+        var emp_dept_name = $(this).parent().siblings("#emp_dept_name").text();
+        $("[name='emp_name']").val(emp_name);
+        $("[name='emp_dob']").val(emp_age);
+        $("[name='emp_dept_name'] option[value=" + emp_dept_name + "]").attr('selected','selected');
+        $("#emp_hide").val("employee_edit");
+        $("#emp_table").hide();
+        $("#emp_form").show();
+    });
+
+});
+
+$(function(){
+    $(".deleteDept").click(function(){
+
+        var dept_id = $(this).parent().siblings("#dept_id").val();
+        $("#dept_hide").val("");
+
+        $.ajax({
+            url: '/website/delete_department/',
+            type: 'POST',
+            data: {
+              'dept_id': dept_id,
+              'type': 'department_delete'
+            },
+            dataType: 'json',
+            success: function (data) {
+              $("#dept_hide").val("department");
+              window.location.reload(false);
+            }
+          });
+
+    });
+    return false;
+
+});
+
+$(function(){
+    $(".deleteEmp").click(function(){
+
+        var emp_id = $(this).parent().siblings("#emp_h_id").val();
+        $("#emp_hide").val("");
+
+        $.ajax({
+            url: '/website/delete_employee/',
+            type: 'POST',
+            data: {
+              'emp_id': emp_id,
+              'type': 'employee_delete'
+            },
+            dataType: 'json',
+            success: function (data) {
+              $("#emp_hide").val("employee");
+              window.location.reload(false);
+            }
+          });
+
+    });
+});
+
+function dept_form_cancel(){
+    $("#dept_form").trigger("reset");
+    $("#dept_form").hide();
+    $("#dept_table").show();
+    $("#dept_hide").val("department");
+}
+
+function emp_form_cancel(){
+    $("#emp_form").trigger("reset");
+    $("#emp_form").hide();
+    $("#emp_table").show();
+    $("#emp_hide").val("employee");
+}
+
+$( document ).ready(function() {
+    $("#dept_form").hide();
+    $("#emp_form").hide();
+    $("#dept_hide").val("department");
+    $("#emp_hide").val("employee");
+    $("#dept_form").trigger("reset");
+    $("#emp_form").trigger("reset");
+});
+</script>
